@@ -324,26 +324,7 @@ public class RarMojo
         }
 
         // Copy dependencies
-        try
-        {
-            Set<Artifact> artifacts = project.getArtifacts();
-            for ( Artifact artifact : artifacts )
-            {
-
-                ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
-                if ( !artifact.isOptional() && filter.include( artifact )
-                    && artifact.getArtifactHandler().isAddedToClasspath() )
-                {
-                    getLog().info( "Copying artifact[" + artifact.getGroupId() + ", " + artifact.getId() + ", "
-                                       + artifact.getScope() + "]" );
-                    FileUtils.copyFileToDirectory( artifact.getFile(), getBuildDir() );
-                }
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Error copying RAR dependencies", e );
-        }
+        copyDependencies();
 
         resourceHandling();
 
@@ -389,6 +370,31 @@ public class RarMojo
         else
         {
             project.getArtifact().setFile( rarFile );
+        }
+    }
+
+    private void copyDependencies()
+        throws MojoExecutionException
+    {
+        try
+        {
+            Set<Artifact> artifacts = project.getArtifacts();
+            for ( Artifact artifact : artifacts )
+            {
+
+                ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+                if ( !artifact.isOptional() && filter.include( artifact )
+                    && artifact.getArtifactHandler().isAddedToClasspath() )
+                {
+                    getLog().info( "Copying artifact[" + artifact.getGroupId() + ", " + artifact.getId() + ", "
+                                       + artifact.getScope() + "]" );
+                    FileUtils.copyFileToDirectory( artifact.getFile(), getBuildDir() );
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error copying RAR dependencies", e );
         }
     }
 
